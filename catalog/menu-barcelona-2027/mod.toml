@@ -1,0 +1,15 @@
+name = "Graphic Menu FC Barcelona 2027"
+cpk_root = ['.\livecpk\Menu Barcelona', '.\livecpk\UIColors']
+lua_module = ["UIColors.lua"]
+
+[[put]]
+from = "game/livecpk/"
+to = "@livecpk/"
+
+[[put]]
+from = "game/modules/"
+to = "@modules/"
+
+[[put]]
+from = "game/content/"
+to = "@sider/content/"

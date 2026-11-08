@@ -1,0 +1,6 @@
+name = "Christian Pulisic face (AC Milan 2027)"
+cpk_root = ['.\livecpk\Faces']
+
+[[put]]
+from = "game/"
+to = "@livecpk/Faces/Asset/model/character/face/real/"

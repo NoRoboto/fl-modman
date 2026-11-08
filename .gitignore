@@ -1,0 +1,6 @@
+# Build output (also spikes/*/target)
+target/
+dist/
+
+# Notes derived from game binaries; kept local, never published
+research/settings-dat/

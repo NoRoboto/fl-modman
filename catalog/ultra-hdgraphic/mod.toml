@@ -1,0 +1,6 @@
+name = "ultra_hdgraphic"
+cpk_root = ['.\livecpk\ultra_hdgraphic']
+
+[[put]]
+from = "ultra_hdgraphic/"
+to = "@livecpk/ultra_hdgraphic/"

@@ -1,0 +1,7 @@
+name = "English Callnames v20"
+version = "20"
+cpk_root = ['.\livecpk\preds-root']
+
+[[put]]
+from = "preds-root/"
+to = "@livecpk/preds-root/"

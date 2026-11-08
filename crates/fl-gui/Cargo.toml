@@ -1,0 +1,18 @@
+[package]
+name = "fl-gui"
+description = "fl-modman gamepad-first GUI"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "fl-modman-gui"
+path = "src/main.rs"
+
+[dependencies]
+eframe.workspace = true
+# Only for the feature: the symbols the screens use (⚠ ☰ ◀ ▶ 📁) live in the emoji fonts.
+egui.workspace = true
+fl-core.workspace = true
+gilrs.workspace = true

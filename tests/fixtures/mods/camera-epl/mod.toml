@@ -1,0 +1,8 @@
+# design.md §10: four camera modules. They depend on lib\nesalib.lua, already in the base.
+name = "Realistic EPL camera 2026"
+version = "2026.1.0"
+lua_module = ["BroadCastCam.lua", "FanViewCam.lua", "PenaltyCam.lua", "StadiumCam.lua"]
+
+[[put]]
+from = "modules/"
+to = "@modules/"

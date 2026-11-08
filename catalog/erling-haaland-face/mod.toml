@@ -1,0 +1,6 @@
+name = "Erling Haaland (short hair) face"
+cpk_root = ['.\livecpk\Faces']
+
+[[put]]
+from = "game/"
+to = "@livecpk/Faces/Asset/model/character/face/real/"

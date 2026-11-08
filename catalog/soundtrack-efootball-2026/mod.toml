@@ -1,0 +1,5 @@
+name = "eFootball 2026 Soundtrack (FL variant)"
+
+[[put]]
+from = "download/eFutBol26 BGM.cpk"
+to = "@download/SMK_Addmusic.cpk"

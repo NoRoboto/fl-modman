@@ -1,0 +1,24 @@
+name = "offside-var"
+version = "1.0-rc"
+cpk_root = ['.\livecpk\Offside VAR']
+lua_module = ["offside.lua"]
+
+[[put]]
+from = "game/SiderAddons/livecpk/root/"
+to = "@livecpk/Offside VAR/"
+
+[[put]]
+from = "game/SiderAddons/modules/offside.lua"
+to = "@modules/offside.lua"
+
+[[put]]
+from = "game/SiderAddons/modules/offside.ini"
+to = "@modules/offside.ini"
+
+[[put]]
+from = "game/offside_banner.addon64"
+to = "@game/offside_banner.addon64"
+
+[[put]]
+from = "game/reshade-shaders/"
+to = "@game/reshade-shaders/"

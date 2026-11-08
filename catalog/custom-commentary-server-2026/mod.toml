@@ -1,0 +1,7 @@
+name = "Custom Commentary Server 2026"
+version = "1.0"
+lua_module = ["custom-comment-server.lua"]
+
+[[put]]
+from = "modules/custom-comment-server.lua"
+to = "@modules/"

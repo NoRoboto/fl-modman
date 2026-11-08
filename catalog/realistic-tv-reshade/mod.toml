@@ -1,0 +1,5 @@
+name = "Realistic TV ReShade preset (matservant)"
+
+[[put]]
+from = "game/PES 2021 Realistic TV Reshade by matservant.ini"
+to = "@game/"

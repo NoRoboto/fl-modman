@@ -1,0 +1,34 @@
+name = "Machete FL27 Immersive camera angles"
+lua_module = ["BroadCastCam.lua", "FanViewCam.lua", "StadiumCam.lua", "VerticalCam.lua"]
+
+[[put]]
+from = "modules/BroadCastCam.lua"
+to = "@modules/"
+
+[[put]]
+from = "modules/BroadCastCam.ini"
+to = "@modules/"
+
+[[put]]
+from = "modules/FanViewCam.lua"
+to = "@modules/"
+
+[[put]]
+from = "modules/StadiumCam.lua"
+to = "@modules/"
+
+[[put]]
+from = "modules/StadiumCam.ini"
+to = "@modules/"
+
+[[put]]
+from = "modules/VerticalCam.lua"
+to = "@modules/"
+
+[[put]]
+from = "modules/VerticalCam.ini"
+to = "@modules/"
+
+[[put]]
+from = "modules/lib/nesalib.lua"
+to = "@modules/lib/"

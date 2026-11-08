@@ -1,0 +1,7 @@
+name = "Premier League 2027 Facepack Vol.1"
+version = "Vol.1"
+cpk_root = ['.\livecpk\Faces']
+
+[[put]]
+from = "game/"
+to = "@livecpk/Faces/Asset/model/character/face/real/"

@@ -1,0 +1,6 @@
+name = "Spotify Camp Nou 2026"
+map_teams = ["108, 002, Spotify Camp Nou 2026, Spotify Camp Nou 2026 # Barcelona"]
+
+[[put]]
+from = "Spotify Camp Nou 2026/"
+to = "@stadiums/Spotify Camp Nou 2026/"

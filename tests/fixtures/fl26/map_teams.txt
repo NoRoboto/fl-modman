@@ -1,0 +1,21 @@
+# Synthetic stadiums team map (test fixture)
+
+
+	#Addons Stadiums:
+
+
+
+	#Pre-installed Stadiums
+
+	103,	004,	Anfield, Anfield			# Liverpool
+	109,	021,	Santiago Bernabeu, Santiago Bernabeu		# Real Madrid
+
+
+# ----------------------------------------
+# game stadiums (do not change)
+108,	002,	Spotify Camp Nou, common\Camp Nou			# Barcelona
+12,	006,	Stadio Olimpico, common\Stadio Olimpico			# Italy NT
+122,	006,	Stadio Olimpico, common\Stadio Olimpico			# Lazio
+116,	070,	Johan Cruijff Arena, common\Johan Cruijff Arena		# Ajax
+
+# end of teams stadiums map

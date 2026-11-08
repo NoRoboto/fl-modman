@@ -1,0 +1,8 @@
+# design.md §10: stadium folder + one map_teams row (team id chosen at import).
+name = "Camp Nou 2026"
+version = "1.0.0"
+map_teams = ["108, 002, Camp Nou 2026, Camp Nou 2026\t# Barcelona"]
+
+[[put]]
+from = "Camp Nou 2026/"
+to = "@stadiums/Camp Nou 2026/"

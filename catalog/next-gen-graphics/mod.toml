@@ -1,0 +1,6 @@
+name = "Next Gen Graphics"
+cpk_root = ['.\livecpk\Next Gen Graphics']
+
+[[put]]
+from = "Next Gen Graphics/"
+to = "@livecpk/Next Gen Graphics/"

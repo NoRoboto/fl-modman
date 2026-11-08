@@ -1,0 +1,6 @@
+name = "Realistic EPL Camera Mod 2026"
+lua_module = ["BroadCastCam.lua", "FanViewCam.lua", "PenaltyCam.lua", "StadiumCam.lua", "VerticalCam.lua"]
+
+[[put]]
+from = "modules/"
+to = "@modules/"

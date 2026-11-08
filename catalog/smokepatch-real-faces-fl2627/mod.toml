@@ -1,0 +1,6 @@
+name = "Real Faces FL26/27 (SmokePatch)"
+version = "update 4 (2026-05-12)"
+
+[[put]]
+from = "download/"
+to = "@download/"

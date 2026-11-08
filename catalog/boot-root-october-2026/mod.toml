@@ -1,0 +1,7 @@
+name = "Boots & Gloves Pack (boot-root) October 2026"
+version = "2026-10"
+cpk_root = ['.\livecpk\boot-root']
+
+[[put]]
+from = "boot-root/"
+to = "@livecpk/boot-root/"

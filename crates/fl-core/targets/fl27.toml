@@ -1,0 +1,41 @@
+# Target: SP Football Life 2027 (verified facts in design.md Appendix A).
+
+id = "fl27"
+exe = "FL_2027.exe"
+version_file = "version.ini"          # content "27.1.0" on the Ally
+sider_dir = "SiderAddons"             # cpk.root entries resolve against this folder (F1)
+sider_ini = "SiderAddons/sider.ini"
+map_teams = "SiderAddons/content/stadiums/map_teams.txt"
+
+# Files the game or the user rewrite: never scanned, never written by a mod (F7).
+user_paths = [
+  "SiderAddons/*.log",
+  "SiderAddons/*.cache",
+  "SiderAddons/content/*/config.ini",
+  "SiderAddons/narrador-events.jsonl",
+  "ReShade.log",
+  "ReShade.ini",
+]
+
+# Placed files the game or Sider modules rewrite at runtime (e.g. camera module settings):
+# never reported as drift, and left as they are while the wanted content does not change.
+# settings.dat and saves live in the prefix (Documents/SPGAME), outside the game tree.
+drift_ignore = [
+  "SiderAddons/modules/*.ini",
+  "SiderAddons/modules/*/*.ini",
+]
+
+# Heavy assets the game never writes: hardlinked (same filesystem), everything else copied.
+hardlink_ext = ["cpk", "acb", "awb", "ftex", "dll"]
+
+# Top-level folders of livecpk content, matched case-insensitively by import.
+livecpk_dirs = ["common", "Asset", "ags", "eng", "spa", "mex", "fre", "ger", "ita", "por", "bra", "jpn", "rus", "tur"]
+
+[roots]                               # @root in mod.toml -> path relative to the game dir
+game = "."
+sider = "SiderAddons"
+livecpk = "SiderAddons/livecpk"
+modules = "SiderAddons/modules"
+stadiums = "SiderAddons/content/stadiums"   # confirmed by Camp Nou on FL27 (design §11)
+download = "download"
+data = "Data"

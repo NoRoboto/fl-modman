@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=fl-modman
+Comment=Mod manager for SP Football Life 2027 on Linux/Proton
+Exec=fl-modman-gui
+Icon=fl-modman
+Categories=Game;Utility;
+Terminal=false

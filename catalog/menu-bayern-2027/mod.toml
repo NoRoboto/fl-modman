@@ -1,0 +1,15 @@
+name = "Graphic Menu FC Bayern Munchen 2027"
+cpk_root = ['.\livecpk\Menu Bayern', '.\livecpk\UIColors']
+lua_module = ["UIColors.lua"]
+
+[[put]]
+from = "game/livecpk/"
+to = "@livecpk/"
+
+[[put]]
+from = "game/modules/"
+to = "@modules/"
+
+[[put]]
+from = "game/content/"
+to = "@sider/content/"

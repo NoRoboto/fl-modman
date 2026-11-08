@@ -1,0 +1,14 @@
+name = "Machete FL27 Immersive indicators"
+cpk_root = ['.\livecpk\NoBallX', '.\livecpk\FanuIndics', '.\livecpk\FanuIndics2']
+
+[[put]]
+from = "indicators/NoBallX/"
+to = "@livecpk/NoBallX/"
+
+[[put]]
+from = "indicators/FanuIndics/"
+to = "@livecpk/FanuIndics/"
+
+[[put]]
+from = "indicators/FanuIndics2/"
+to = "@livecpk/FanuIndics2/"

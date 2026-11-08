@@ -1,0 +1,17 @@
+# design.md §10: livecpk commentary. The language slot is fixed to eng; another slot is
+# another mod (grilling Q13).
+name = "Mariano Closs V5"
+version = "5.0.0"
+cpk_root = ['.\livecpk\Mariano Closs V5']
+
+[[put]]
+from = "Mariano Closs V5/ags/sound/"
+to = "@livecpk/Mariano Closs V5/eng/sound/"
+
+[[put]]
+from = "Mariano Closs V5/mex/"
+to = "@livecpk/Mariano Closs V5/mex/"
+
+[[put]]
+from = "Mariano Closs V5/spa/string/"
+to = "@livecpk/Mariano Closs V5/spa/string/"

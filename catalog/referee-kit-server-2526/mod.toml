@@ -1,0 +1,16 @@
+name = "Referee Kit Server 2025/26"
+version = "2025/26"
+cpk_root = ['.\livecpk\RefColor']
+lua_module = ["RefKitServer.lua"]
+
+[[put]]
+from = "game/livecpk/"
+to = "@livecpk/"
+
+[[put]]
+from = "game/modules/"
+to = "@modules/"
+
+[[put]]
+from = "game/content/"
+to = "@sider/content/"

@@ -1,0 +1,8 @@
+# design.md §10: livecpk cursor root.
+name = "Machete Cursors"
+version = "1.0.0"
+cpk_root = ['.\livecpk\Machete Cursors']
+
+[[put]]
+from = "Machete Cursors/"
+to = "@livecpk/Machete Cursors/"

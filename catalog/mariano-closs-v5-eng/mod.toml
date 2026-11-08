@@ -1,0 +1,7 @@
+name = "Mariano Closs V5 (English slot)"
+version = "5"
+cpk_root = ['.\livecpk\Mariano Closs V5']
+
+[[put]]
+from = "Mariano Closs V5/ags/sound/"
+to = "@livecpk/Mariano Closs V5/eng/sound/"
