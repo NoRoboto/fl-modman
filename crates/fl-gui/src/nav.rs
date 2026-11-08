@@ -2,7 +2,7 @@
 //! order each frame; A activates the focused one, and the directions left over once the screen
 //! has drawn (a screen may take them first, e.g. in move mode) move the focus.
 
-use eframe::egui::{Response, Stroke, StrokeKind, Ui};
+use eframe::egui::{Align, Response, Stroke, StrokeKind, Ui};
 
 use crate::input::Action;
 use crate::ui::{ACCENT, FOCUS, RADIUS};
@@ -73,7 +73,11 @@ impl Nav {
             let (stroke, rect) = (Stroke::new(FOCUS, ACCENT), r.rect.expand(FOCUS));
             ui.painter()
                 .rect_stroke(rect, RADIUS, stroke, StrokeKind::Outside);
-            if self.scroll {
+            // The first item scrolls the area to its top (a screen's summary above it stays
+            // visible); the others scroll as little as needed.
+            if self.scroll && self.focus == 0 {
+                ui.scroll_to_rect(r.rect.with_min_y(r.rect.top() - 1e5), Some(Align::TOP));
+            } else if self.scroll {
                 r.scroll_to_me(None);
             }
         }

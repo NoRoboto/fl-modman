@@ -51,7 +51,8 @@ toggle; `hot` = accent tint for the mod being moved / the picked generation), **
 **Stepper** (`◀ value ▶`, `*` while pending), **Button** via the action bar (`actions`: right-aligned, the last
 label is the primary, accent-filled; on a screen that opens with only buttons it takes the focus), **Badge**
 (⚠ warning line), **HintBar** (fixed bottom panel). Layout: one primary action per screen, bottom-right above
-the hint bar; scrolled content in `body`; no text explaining controls; long lists collapsed (the "Already
+the hint bar; scrolled content in `body` (focusing the first item scrolls it to the top, so a summary above the
+first row stays reachable); no text explaining controls; long lists collapsed (the "Already
 installed (base)" card opens with A, one row per item).
 
 ## Screens
@@ -71,8 +72,9 @@ installed (base)" card opens with A, one row per item).
    backup, after a confirm, refused while the game runs; plus the Proton launch-options diagnostic (read only).
 6. **Storage**: measured on a background thread when the tab opens and after Free, never per frame
    (`Workspace::usage`, stat only). A ⚠ line when the workspace and the game are on different filesystems, a
-   Workspace card (mods, only in the workspace, originals, history, staging leftovers, total, can be freed), then one
-   focusable row per mod: id, state (applied / on, not applied yet / off, still in the game / off), file count, size
+   compact Workspace card (two text lines: mods, only in the workspace, originals, history, staging leftovers, total;
+   what can be freed in its title), then one focusable row per mod: id, state (applied / on, not applied yet / off,
+   still in the game / off), size
    and bytes shared with the game (only `hardlink_ext` assets can be; copied files and files a lower mod overrides
    are not), then orphan folders. Notes (a symlinked or missing mod folder, a broken mod, no
    game folder) show as ⚠ lines; if measuring failed the tab says so (open it again to retry). **Free X** (only when

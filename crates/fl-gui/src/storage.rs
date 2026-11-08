@@ -5,12 +5,12 @@
 
 use std::sync::Arc;
 
-use eframe::egui::Ui;
+use eframe::egui::{Grid, RichText, Ui};
 use fl_core::plan::human_size;
 use fl_core::usage::{ModUsage, Usage};
 
 use crate::app::{Act, App, Then};
-use crate::ui::{self, Row};
+use crate::ui::{self, MUTED, Row, S1, S3};
 
 #[derive(Default)]
 pub struct Storage {
@@ -51,7 +51,7 @@ fn state(m: &ModUsage) -> &'static str {
     match (m.enabled, m.applied) {
         (true, true) => "Applied",
         (true, false) => "On, not applied yet",
-        (false, true) => "Off, still in the game until you apply",
+        (false, true) => "Off, in the game until you apply",
         (false, false) => "Off",
     }
 }
@@ -72,35 +72,45 @@ pub fn show(app: &mut App, ui: &mut Ui) {
             );
         }
         u.notes.iter().for_each(|n| ui::badge(ui, n));
-        ui::card(ui, "Workspace", |ui| {
+        // Dense text, not full-height rows, so the totals and several mods fit on one screen.
+        let free = human_size(u.reclaimable());
+        let title = format!("Workspace · {free} can be freed (mods off and not applied)");
+        ui::card(ui, &title, |ui| {
             let only: u64 = u.mods.iter().map(ModUsage::only_here).sum();
-            let rows = [
+            let cells = [
                 ("Mods", u.mods_dir),
-                ("  of which only in the workspace", only),
+                ("Only in the workspace", only),
                 ("Game files kept for undo", u.originals),
                 ("History", u.history),
                 ("Leftovers of failed imports", u.staging),
                 ("Total", u.total),
-                (
-                    "Can be freed (mods that are off and not applied)",
-                    u.reclaimable(),
-                ),
             ];
-            for (k, v) in rows {
-                Row::new(k, human_size(v)).show(ui, |_| {});
-            }
+            let grid = Grid::new("totals").spacing([S3, S1]).min_row_height(0.0);
+            grid.show(ui, |ui| {
+                for line in cells.chunks(3) {
+                    for (k, v) in line {
+                        ui.label(RichText::new(*k).color(MUTED));
+                        ui.label(human_size(*v));
+                    }
+                    ui.end_row();
+                }
+            });
         });
         ui::card(ui, "Mods: size (shared with the game)", |ui| {
             for m in &u.mods {
-                let label = format!("{}\n{} · {} file(s)", m.id, state(m), m.files);
-                let meta = format!("{}  ({} shared)", human_size(m.bytes), human_size(m.shared));
-                let mut row = Row::new(label, meta);
+                let meta = format!(
+                    "{} · {}  ({} shared)",
+                    state(m),
+                    human_size(m.bytes),
+                    human_size(m.shared)
+                );
+                let mut row = Row::new(&m.id, meta);
                 row.muted = !m.enabled;
                 row.nav(ui, &mut app.nav);
             }
             for (id, b) in &u.orphans {
-                let label = format!("{id}\nOrphan folder: not in the mod list");
-                Row::new(label, human_size(*b)).nav(ui, &mut app.nav);
+                let meta = format!("Orphan folder, not in the list · {}", human_size(*b));
+                Row::new(id, meta).nav(ui, &mut app.nav);
             }
             if u.mods.is_empty() && u.orphans.is_empty() {
                 ui.weak("No mods yet.");
