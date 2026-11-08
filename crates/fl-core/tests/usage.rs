@@ -273,6 +273,22 @@ fn a_recent_staging_is_kept() {
 fn orphan_folders_are_listed_and_removed_only_when_asked() {
     let (_, mut ws) = lab("usage-orphan");
     write_files(&ws.dir, &[("mods/stray/a.bin", "abc")]);
+    // Just written (an import may be running): kept, with a note.
+    let u = ws.usage().unwrap();
+    assert!(u.orphans.is_empty() && u.reclaimable() == 0, "{u:?}");
+    assert!(
+        u.notes
+            .iter()
+            .any(|n| n.contains("mods/stray: orphan folder changed in the last 10 minutes"))
+    );
+    let f = ws.remove_disabled(&ids(&["stray"]), false).unwrap();
+    assert!(
+        f.removed.is_empty() && f.kept[0].contains("no longer removable"),
+        "{f:?}"
+    );
+    assert!(ws.dir.join("mods/stray/a.bin").is_file());
+
+    age(&ws.dir.join("mods/stray"));
     let u = ws.usage().unwrap();
     assert_eq!(u.orphans, [("stray".to_string(), 3)]);
     assert_eq!((u.reclaimable(), u.reclaimable_ids()), (3, ids(&["stray"])));

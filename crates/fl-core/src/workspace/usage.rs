@@ -18,8 +18,9 @@ use crate::adapters::fs::{file_id, remove_path, walk_files};
 use crate::error::{Result, input, io};
 use crate::manifest::Package;
 
-/// `staging/` is not wiped while anything in it changed this recently (an import may be running).
-pub const STAGING_QUIET: Duration = Duration::from_secs(600);
+/// `staging/` and orphan folders are not deleted while anything in them changed this recently
+/// (an import may be writing them).
+pub const QUIET: Duration = Duration::from_secs(600);
 
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct ModUsage {
@@ -50,7 +51,8 @@ impl ModUsage {
 pub struct Usage {
     /// In list order.
     pub mods: Vec<ModUsage>,
-    /// Folders under `mods/` that are not in the list (left by a crash or by hand), with bytes.
+    /// Folders under `mods/` that are not in the list (left by a crash or by hand), with bytes;
+    /// one changed within [`QUIET`] is left out (a note says so).
     pub orphans: Vec<(String, u64)>,
     /// All of `mods/`, including the orphans.
     pub mods_dir: u64,
@@ -233,7 +235,12 @@ impl Workspace {
                         let orphan =
                             id.filter(|id| !listed.contains_key(id) && check_id(id).is_ok());
                         if let Some(id) = orphan.filter(|_| lstat(&d).is_ok_and(|m| m.is_dir())) {
-                            orphans.push((id.to_string(), b));
+                            match recent(&d, QUIET)? {
+                                true => u.notes.push(format!(
+                                    "mods/{id}: orphan folder changed in the last 10 minutes, kept"
+                                )),
+                                false => orphans.push((id.to_string(), b)),
+                            }
                         }
                         n += b;
                     }
@@ -272,7 +279,11 @@ impl Workspace {
                 match () {
                     _ if removable.contains(id) => self.remove(id)?,
                     _ if orphans.contains(id) => remove_path(&dir)?,
-                    _ => return Err(input("no longer removable (enabled or applied)")),
+                    _ => {
+                        return Err(input(
+                            "no longer removable (enabled, applied, or a recent orphan)",
+                        ));
+                    }
                 }
                 Ok(bytes)
             });
@@ -285,12 +296,12 @@ impl Workspace {
         Ok(f)
     }
 
-    /// Wipes `staging/` unless something in it changed within [`STAGING_QUIET`]. A symlinked
+    /// Wipes `staging/` unless something in it changed within [`QUIET`]. A symlinked
     /// `staging` loses only the link.
     fn wipe_staging(&self) -> Result<u64> {
         let s = self.dir.join("staging");
         let link = fs::symlink_metadata(&s).is_ok_and(|m| m.file_type().is_symlink());
-        if !link && s.exists() && recent(&s, STAGING_QUIET)? {
+        if !link && s.exists() && recent(&s, QUIET)? {
             return Err(input(
                 "changed in the last 10 minutes (an import may be running); kept",
             ));
