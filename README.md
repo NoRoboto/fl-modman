@@ -72,8 +72,10 @@ Resolution, fullscreen, HDR, frame rates and the rendering options, edited strai
 ## Storage
 
 The **Storage** tab (and `fl-modman usage`) shows how much space each mod takes, how much of it is
-shared with the game, and what the workspace holds in total. **Free** deletes the mods that are
-switched off and no longer applied (the same rule as `fl-modman remove --disabled`).
+shared with the game, and what the workspace holds in total. **Free** lists the mods that are
+switched off and no longer applied, plus leftovers of failed imports, and after you confirm deletes
+exactly that list (the same rule as `fl-modman remove --disabled`). Nothing is deleted while the
+game runs.
 
 Where the space goes:
 

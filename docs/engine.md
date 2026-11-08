@@ -81,16 +81,23 @@ these (or says the file is missing: the game writes it once its rendering menu w
 checks every pair before writing either file, and refuses render keys while the file is missing.
 
 **Usage.** `Workspace::usage` (`workspace/usage.rs`) walks the workspace with `symlink_metadata` only: no hashing,
-symlinks never followed (about 0.2 s for 25k payload files, warm cache). Per mod: files and bytes under `mods/<id>/`,
-and **shared** bytes: a payload file whose (device, inode) equals the file at its tree path in the game, i.e. the
-hardlink apply made. Only applied mods are checked (one extra `lstat` per put). `nlink > 1` was not used: it would
-also count links fl-modman did not make, and a payload another mod overrides. Totals for `mods/`, `originals/`,
-`history/`, `staging/` and the whole folder. **Reclaimable** = mods that are disabled and not in the last complete
-generation (the `remove` rule, `Workspace::removable`) plus `staging/`. `same_fs` compares the `st_dev` of the
-workspace and the game: on different filesystems apply copies (hardlinks need one filesystem; btrfs subvolumes count
-as different), so every applied byte is stored twice. `remove --disabled` (`Workspace::remove_disabled`) deletes
-exactly the reclaimable set; without `--yes` it only lists it, and names the disabled mods kept because they are
-still applied.
+symlinks never followed. Per mod: files and bytes under `mods/<id>/`, and **shared** bytes: a payload file whose
+(device, inode) equals the file at its tree path in the game, i.e. the hardlink apply made. Only applied mods are
+checked (one extra `lstat` per put). `nlink > 1` was not used: it would also count links fl-modman did not make, and a
+payload another mod overrides. Totals for `mods/`, `originals/`, `history/`, `staging/` and the whole folder;
+**orphans** are real folders under `mods/` that are not in the list. A symlinked or missing mod folder, a mod whose
+`mod.toml` does not load (shared = 0) and a missing game folder (`same_fs` assumed) become `notes`, not errors.
+**Reclaimable** = mods that are disabled and not in the last complete generation (the `remove` rule,
+`Workspace::removable`), orphans and `staging/`. `same_fs` compares the `st_dev` of the workspace and the game: on
+different filesystems apply copies (hardlinks need one filesystem; btrfs subvolumes count as different), so every
+applied byte is stored twice. Usage works during an interrupted apply (the CLI allows it before the pending check).
+
+**Remove.** Mod ids must be one plain path component. `remove <id>` and `remove --disabled`
+(`Workspace::remove_disabled`) are refused while the game runs or an apply is interrupted. `--disabled` without
+`--yes` prints the list (mods, orphans, staging); with `--yes` it deletes exactly the ids it printed: each is checked
+again and kept with a reason if it no longer qualifies, a failure keeps that item and the rest go on, and the
+command exits non-zero if anything was kept. A symlink (`mods/<id>`, `staging`) loses only the link. `staging/` is
+not wiped while anything in it changed in the last 10 minutes (`STAGING_QUIET`: an import may be running).
 
 ## Code
 
