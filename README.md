@@ -1,45 +1,99 @@
+<div align="center">
+
 # fl-modman
 
-A mod manager for **SP Football Life 2027** (the PES 2021 mod) on **Linux with Proton**.
-You keep a list of mods; fl-modman works out what to copy and which `sider.ini` and
-`map_teams.txt` lines to add, applies it, and can undo any apply.
+**Mods for SP Football Life 2027 on Linux, without the mess.** You keep one list of mods.
+fl-modman works out what to copy and which `sider.ini` lines to add, shows you the plan,
+applies it, and can undo any apply. Made to be driven with a gamepad, from Steam Gaming Mode.
 
-> Screenshot: not available yet.
+[![Linux](https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black)](#install)
+[![Proton](https://img.shields.io/badge/Proton-1B2838?style=for-the-badge&logo=steam&logoColor=white)](#install)
+[![FL27 only](https://img.shields.io/badge/SP_Football_Life_2027-only-2E7D32?style=for-the-badge)](#tested-on)
+[![Rust](https://img.shields.io/badge/Rust-000000?style=for-the-badge&logo=rust&logoColor=white)](Cargo.toml)
+[![MIT](https://img.shields.io/badge/MIT-3DA639?style=for-the-badge)](LICENSE)
+[![Release](https://img.shields.io/github/v/release/NoRoboto/fl-modman?style=for-the-badge&logo=github&labelColor=24292F)](https://github.com/NoRoboto/fl-modman/releases/latest)
 
-## What it does
+[Tested on](#tested-on) ·
+[My mods](#one-list-the-lower-mod-wins) ·
+[Add a mod](#add-a-mod) ·
+[History](#every-apply-can-be-undone) ·
+[Game settings](#game-settings) ·
+[Install](#install) ·
+[CLI](#cli) ·
+[Safety](#safety)
 
-- Imports mods from zip, 7z, rar or a folder, and detects the mod type: livecpk folder, Lua module,
-  stadium, `download/*.cpk` replacement, or loose files in the game folder.
-- Keeps one ordered mod list. When two mods touch the same file, **the lower mod wins**, and the
-  conflict is shown.
-- Shows the plan before it writes anything. Every apply is a numbered generation you can roll back to.
-- Detects files changed outside fl-modman (for example, a game update) and asks before it continues.
-- Edits the game settings (`settings.dat` and the in-game rendering options).
-- Gamepad-first GUI (works in Steam Gaming Mode) plus a CLI.
+</div>
 
-Scope: Linux/Proton and FL27 only. The GUI is in English.
+<img src="media/tour.webp" width="100%" alt="The four tabs of the GUI in turn: the mod list, the file picker, the history of applies and the game settings">
+
+## Tested on
+
+> [!IMPORTANT]
+> fl-modman is built for **SP Football Life 2027** and tested **only** with it, on an ASUS ROG Ally
+> (Bazzite, Steam Gaming Mode, Proton). Other PES 2021 mods, other games and other distros are not
+> supported. It may work, but nobody has checked.
+
+## One list, the lower mod wins
+
+<img src="media/my-mods.png" width="100%" alt="My mods: five mods, each with an ON switch, its type and file count, and a warning that next-gen-graphics overrides 635 files of ultra-hdgraphic">
+
+**Every mod you add goes on one ordered list.** When two mods touch the same file, the lower one
+wins, and the conflict is shown on both. Switch a mod off, move it up or down, press
+**Apply changes**: nothing is written until you see the plan.
+
+It knows the five kinds of FL27 mod: livecpk folders, Lua modules, stadiums, `download/*.cpk`
+replacements and loose files in the game folder.
+
+## Add a mod
+
+<img src="media/add-mod.png" width="100%" alt="Add mod: a file picker in the Downloads folder with a zip, a rar and an extracted mod folder">
+
+Pick a zip, 7z or rar, or a folder you already extracted. fl-modman finds the mod inside, works out
+its type and adds it at the bottom of the list. Mods with odd layouts take a small
+[`mod.toml`](docs/mod-toml.md); [`catalog/`](catalog) has ready-made ones for some public mods
+(links only, no mod files).
+
+## Every apply can be undone
+
+<img src="media/history.png" width="100%" alt="History: generations 12 back to 8, each with the mods it applied and how long ago">
+
+**Each Apply is a numbered generation.** Pick one and press **Go back to this** to return to it,
+files and mod list included. A game update or a file you changed by hand is detected as drift, and
+fl-modman asks before it touches anything.
+
+## Game settings
+
+<img src="media/settings.png" width="100%" alt="Game settings: resolution, fullscreen and HDR, then frame rate in game and in replays">
+
+Resolution, fullscreen, HDR, frame rates and the rendering options, edited straight in the game's
+`settings.dat`, so you don't need the Windows settings tool under Proton. A backup is made first.
 
 ## Install
 
-1. Download `fl-modman-<version>-x86_64.AppImage` from the Releases page.
-2. Make it executable: `chmod +x fl-modman-*.AppImage`
-3. Run it. To use it from Steam Gaming Mode, add it as a non-Steam game.
+1. Download `fl-modman-<version>-x86_64.AppImage` from
+   [Releases](https://github.com/NoRoboto/fl-modman/releases/latest), and check it with
+   `sha256sum -c fl-modman-<version>-x86_64.AppImage.sha256`.
+2. `chmod +x fl-modman-*.AppImage`
+3. Run it. For Gaming Mode, add it to Steam as a non-Steam game.
 
-rar archives need a system tool: `7z`, `7zz`, `unrar` or `bsdtar`. zip and 7z work out of the box.
+On the first run it looks for FL27 installs, lets you pick one and takes a snapshot of the game as
+it is. That snapshot is your base.
 
-Build from source (Rust 1.96+): `cargo build --release`, or `scripts/build-appimage.sh` for the AppImage.
+rar archives need `7z`, `7zz`, `unrar` or `bsdtar` on the system; zip and 7z work out of the box.
 
-## Quick start
+| Gamepad | Keyboard | |
+|:-:|:-:|---|
+| <kbd>L1</kbd> <kbd>R1</kbd> | <kbd>Q</kbd> <kbd>E</kbd> | switch tabs |
+| <kbd>A</kbd> | <kbd>Enter</kbd> | open, accept |
+| <kbd>X</kbd> (or <kbd>A</kbd> on My mods) | <kbd>Space</kbd> | switch a mod on or off |
+| <kbd>Y</kbd> | <kbd>M</kbd> | move a mod |
+| <kbd>B</kbd> | <kbd>Esc</kbd> | back, quit |
 
-### GUI
+More in [docs/gui.md](docs/gui.md).
 
-Run the AppImage. It looks for FL27 installs, lets you pick one, and then shows the mod list.
-Add a mod, review the plan, apply. The History tab rolls back to an earlier generation.
-Controls and screens: [docs/gui.md](docs/gui.md).
+## CLI
 
-### CLI
-
-The AppImage runs the CLI with `cli` as the first argument (`./fl-modman.AppImage cli --help`).
+The AppImage runs the CLI when `cli` is the first argument (`./fl-modman.AppImage cli --help`).
 From a source build the binary is `fl-modman`.
 
 ```sh
@@ -58,24 +112,27 @@ fl-modman rollback 1 --yes                # go back to generation 1
 Stadiums need a team: `fl-modman import <src> --team <id>[,<slot>]`.
 All commands: `fl-modman --help` and [docs/engine.md](docs/engine.md).
 
-The `init` snapshot is your base. Mods you installed by hand before that stay in place, but
-fl-modman does not manage them. Re-import them to manage them.
-
-## Writing a mod.toml
-
-Each mod has a `mod.toml` that says what to copy and which lines to add. Import generates one;
-you can also write your own. Format: [docs/mod-toml.md](docs/mod-toml.md).
-`catalog/` has ready-made manifests for some public mods. It holds links only, no mod files.
+Mods you installed by hand before `init` stay in place, but fl-modman does not manage them.
+Re-import them to manage them.
 
 ## Safety
 
-- **Mods can contain code.** `.lua` modules run inside the game through Sider, `.addon64` files are
-  ReShade add-ons (native code), and some mods ship `.exe` or `.dll` files. Only install mods from
-  sources you trust. fl-modman copies files; it does not scan or sandbox them.
+> [!WARNING]
+> **Mods can contain code.** `.lua` modules run inside the game through Sider, `.addon64` files are
+> ReShade add-ons (native code), and some mods ship `.exe` or `.dll` files. Install only mods from
+> sources you trust. fl-modman copies files; it does not scan or sandbox them.
+
 - fl-modman refuses to apply while the game is running.
-- A game file a mod replaces is saved first, in `<workspace>/originals/`, so undo can restore it. This
-  covers only files that were in the base snapshot taken at `init`.
-- fl-modman does not edit Steam files. `fl-modman doctor` prints the Proton launch options to paste yourself.
+- A game file a mod replaces is saved first, in `<workspace>/originals/`, so undo can restore it.
+  This covers only files that were in the base snapshot taken at `init`.
+- Archives are extracted into an empty folder and rejected if they hold symlinks or paths that
+  point outside it.
+- fl-modman does not edit Steam files. `fl-modman doctor` prints the Proton launch options to paste
+  yourself.
+
+## Build from source
+
+Rust 1.96+: `cargo build --release`, or `scripts/build-appimage.sh` for the AppImage.
 
 ## License
 

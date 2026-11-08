@@ -1,7 +1,7 @@
 # Offside VAR 1.0-rc
 
 - Author: Kris1982. Archive `FL27_Pes21_Offside_VAR_1.0-rc.zip` (2026-11-07).
-- Video: https://www.youtube.com/watch?v=RydBoISDx9k
+- Video: https://www.youtube.com/watch?v=RPtgnXa21W4
 - Download: https://drive.google.com/file/d/1AKIX_WpryLa0ORHJ-I4nGa37LppZ9RJR/view
 - Type: Lua module + livecpk model + ReShade add-on and effect.
 
