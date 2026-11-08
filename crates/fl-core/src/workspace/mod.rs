@@ -2,13 +2,15 @@
 //! (`index`), `originals/` (base files a mod replaced, for undo), `history/NNNN.toml`
 //! (generations) and `hashes.json` (`scan`). `apply` records an in-progress generation, applies
 //! file by file and marks it complete (Q12), behind a drift check against the last complete one
-//! (Q9). `import` adds mods, `settings` edits the game's settings files.
+//! (Q9). `import` adds mods, `settings` edits the game's settings files, `usage` measures the
+//! workspace on disk.
 
 mod apply;
 pub mod import;
 pub mod index;
 mod scan;
 pub mod settings;
+pub mod usage;
 
 use std::collections::BTreeSet;
 use std::fs;
@@ -195,5 +197,31 @@ impl Workspace {
         self.save()?;
         let d = self.dir.join("mods").join(id);
         fs::remove_dir_all(&d).map_err(io(&d))
+    }
+
+    /// The mods [`Workspace::remove`] may delete: disabled and not in the last complete
+    /// generation, in list order.
+    pub fn removable(&self) -> Result<Vec<String>> {
+        let applied = self.last()?.map(|g| g.mods).unwrap_or_default();
+        let ids = self
+            .state
+            .mods
+            .iter()
+            .filter(|m| self.state.disabled.contains(*m) && !applied.contains(m));
+        Ok(ids.cloned().collect())
+    }
+
+    /// Deletes every [`Workspace::removable`] mod and the `staging/` leftovers of failed
+    /// imports. Returns the ids removed.
+    pub fn remove_disabled(&mut self) -> Result<Vec<String>> {
+        let ids = self.removable()?;
+        for id in &ids {
+            self.remove(id)?;
+        }
+        let staging = self.dir.join("staging");
+        if fs::symlink_metadata(&staging).is_ok() {
+            fs::remove_dir_all(&staging).map_err(io(&staging))?;
+        }
+        Ok(ids)
     }
 }

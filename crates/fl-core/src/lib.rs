@@ -17,7 +17,7 @@ pub use adapters::{HOST, detect};
 pub use codec::graphics;
 pub use domain::{base, build, hash, manifest, paths, plan, target};
 pub use error::{Error, Result};
-pub use workspace::{import, settings};
+pub use workspace::{import, settings, usage};
 
 /// With `FL_MODMAN_TIMING` set, prints to stderr the time since the previous call.
 pub fn lap(label: &str) {

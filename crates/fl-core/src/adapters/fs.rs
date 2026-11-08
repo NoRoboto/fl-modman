@@ -65,6 +65,13 @@ pub fn place(src: &Path, dst: &Path, link: bool) -> Result<()> {
     fs::rename(&t, dst).map_err(io(dst))
 }
 
+/// (device, inode) of a file, from metadata read without following symlinks: two paths with the
+/// same id are hardlinks to one file.
+pub fn file_id(m: &fs::Metadata) -> (u64, u64) {
+    use std::os::unix::fs::MetadataExt;
+    (m.dev(), m.ino())
+}
+
 /// Visits every regular file under `root/rel` in sorted order without following symlinks.
 /// Non-regular entries (symlinks, devices) are recorded in `skipped`.
 pub fn walk_files(
