@@ -9,6 +9,7 @@ mod mods;
 mod nav;
 mod pick;
 mod settings;
+mod storage;
 mod ui;
 mod widgets;
 

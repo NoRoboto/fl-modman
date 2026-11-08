@@ -21,7 +21,7 @@ use crate::input::{Action, Input};
 use crate::nav::Nav;
 use crate::ui::{self, A, B, Hint, S1, S2, S3, S4, SURFACE, WARNING, Y};
 use crate::widgets::NumPicker;
-use crate::{add, history, mods, pick, settings};
+use crate::{add, history, mods, pick, settings, storage};
 
 /// What the mod list needs to compute conflicts without touching the disk.
 #[derive(Clone)]
@@ -139,13 +139,15 @@ pub enum Tab {
     Add,
     History,
     Settings,
+    Storage,
 }
 
-const TABS: [(Tab, &str); 4] = [
+const TABS: [(Tab, &str); 5] = [
     (Tab::Mods, "My mods"),
     (Tab::Add, "Add mod"),
     (Tab::History, "History"),
     (Tab::Settings, "Game settings"),
+    (Tab::Storage, "Storage"),
 ];
 
 /// What a confirmed dialog does.
@@ -155,6 +157,7 @@ pub enum Act {
     Apply,
     Rollback(u32),
     SaveSettings,
+    Free,
     Quit,
 }
 
@@ -195,6 +198,7 @@ pub struct App {
     pub add: add::Add,
     pub history: history::History,
     pub settings: settings::Settings,
+    pub storage: storage::Storage,
 }
 
 impl App {
@@ -272,13 +276,17 @@ impl App {
         self.tab = tab;
         self.nav.reset();
         self.load_tab();
+        // Measured on open only: `load_tab` also runs after every job.
+        if tab == Tab::Storage {
+            storage::load(self);
+        }
     }
 
     fn load_tab(&mut self) {
         match self.tab {
             Tab::History => history::load(self),
             Tab::Settings => settings::load(self),
-            Tab::Mods | Tab::Add => {}
+            Tab::Mods | Tab::Add | Tab::Storage => {}
         }
     }
 
@@ -335,6 +343,7 @@ impl App {
                 done(msg)
             }),
             Act::SaveSettings => settings::save(self),
+            Act::Free => storage::free(self),
             Act::Quit => self.ctx.send_viewport_cmd(egui::ViewportCommand::Close),
         }
     }
@@ -449,6 +458,7 @@ impl App {
             },
             (_, Tab::History) => vec![(A, "Go back"), (B, "Quit")],
             (_, Tab::Settings) => vec![("[A]/◀▶", "Change"), (B, "Quit")],
+            (_, Tab::Storage) => vec![(A, "Select"), (B, "Quit")],
         };
         if self.banner.is_some() {
             h.retain(|k| k.0 != B);
@@ -491,6 +501,7 @@ impl App {
             (_, Tab::Add) => add::show(self, ui),
             (_, Tab::History) => history::show(self, ui),
             (_, Tab::Settings) => settings::show(self, ui),
+            (_, Tab::Storage) => storage::show(self, ui),
         }
         // B that no screen used: ask before quitting (handhelds have no window close button).
         if self.nav.take(Action::Back) {
@@ -568,8 +579,10 @@ mod tests {
         assert_eq!(hints(&app), digits);
         app.tab = Tab::Settings;
         assert_eq!(hints(&app), format!("[A]/◀▶ Change    [B] Quit{tabs}"));
+        app.tab = Tab::Storage;
+        assert_eq!(hints(&app), format!("[A] Select    [B] Quit{tabs}"));
         app.banner = Some(("saved".into(), false));
-        assert_eq!(hints(&app), format!("[A]/◀▶ Change    [B] Dismiss{tabs}"));
+        assert_eq!(hints(&app), format!("[A] Select    [B] Dismiss{tabs}"));
         app.ask("Quit?", String::new(), "Quit", Act::Quit);
         assert_eq!(hints(&app), "[A] Select    [B] Cancel");
     }
