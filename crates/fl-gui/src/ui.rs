@@ -185,6 +185,12 @@ pub fn stepper(ui: &mut Ui, nav: &mut Nav, label: &str, value: &str, pending: bo
 /// (accent-filled; it takes the focus on a screen that opens with nothing else to focus). The
 /// index of the one pressed.
 pub fn actions(ui: &mut Ui, nav: &mut Nav, labels: &[&str]) -> Option<usize> {
+    actions_focus(ui, nav, labels, labels.len() - 1)
+}
+
+/// [`actions`], with the button `focus` taking the focus on open (a destructive confirm
+/// focuses Cancel).
+pub fn actions_focus(ui: &mut Ui, nav: &mut Nav, labels: &[&str], focus: usize) -> Option<usize> {
     let font = TextStyle::Button.resolve(ui.style());
     let width = |l: &&str| {
         let g = ui
@@ -193,7 +199,7 @@ pub fn actions(ui: &mut Ui, nav: &mut Nav, labels: &[&str]) -> Option<usize> {
         (g.size().x + 2.0 * S2).max(180.0) + S1
     };
     let (total, last) = (labels.iter().map(width).sum::<f32>(), labels.len() - 1);
-    nav.autofocus(nav.next_index() + last);
+    nav.autofocus(nav.next_index() + focus);
     ui.add_space(S1);
     let row = ui.horizontal(|ui| {
         ui.add_space((ui.available_width() - total).max(0.0));

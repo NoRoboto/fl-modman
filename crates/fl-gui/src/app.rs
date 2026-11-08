@@ -157,7 +157,8 @@ pub enum Act {
     Apply,
     Rollback(u32),
     SaveSettings,
-    Free,
+    /// The listed mod ids and orphan folders, and whether staging/ was listed.
+    Free(Vec<String>, bool),
     Quit,
 }
 
@@ -343,7 +344,7 @@ impl App {
                 done(msg)
             }),
             Act::SaveSettings => settings::save(self),
-            Act::Free => storage::free(self),
+            Act::Free(ids, staging) => storage::free(self, ids, staging),
             Act::Quit => self.ctx.send_viewport_cmd(egui::ViewportCommand::Close),
         }
     }
@@ -425,7 +426,9 @@ impl App {
         ui.heading(&c.title);
         ui.add_space(S2);
         ui::body(ui, |ui| ui::card(ui, "", |ui| ui.monospace(&c.body)));
-        let pressed = ui::actions(ui, &mut self.nav, &["Cancel", &c.yes]);
+        // Deleting files starts on Cancel.
+        let focus = usize::from(!matches!(c.act, Act::Free(..)));
+        let pressed = ui::actions_focus(ui, &mut self.nav, &["Cancel", &c.yes], focus);
         let yes = pressed == Some(1);
         if yes || back || pressed.is_some() {
             let c = self.confirm.take().expect("confirm shown");

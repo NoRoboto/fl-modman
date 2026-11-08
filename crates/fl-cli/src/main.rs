@@ -144,6 +144,11 @@ fn run(cli: Cli) -> Result<()> {
         );
         return Ok(());
     }
+    // Read-only, so it also works after an interrupted apply.
+    if let Cmd::Usage = cmd {
+        print!("{}", usage_text(&ws.usage()?));
+        return Ok(());
+    }
     ws.refuse_pending()?;
     match cmd {
         Cmd::Import {
@@ -195,7 +200,6 @@ fn run(cli: Cli) -> Result<()> {
         }
         Cmd::Remove { id: Some(id), .. } => ws.remove(&id)?,
         Cmd::Remove { id: None, .. } => remove_disabled(&mut ws, cli.yes)?,
-        Cmd::Usage => print!("{}", usage_text(&ws.usage()?)),
         Cmd::Apply => report(ws.apply(&ws.enabled(), "apply", cli.yes, true)?),
         Cmd::Rollback { n } => report(ws.rollback(n, cli.yes)?),
         Cmd::Restore => report(ws.restore()?),
@@ -257,7 +261,9 @@ fn run(cli: Cli) -> Result<()> {
                 }
             }
         }
-        Cmd::Detect | Cmd::Doctor | Cmd::Init { .. } | Cmd::Recover { .. } => unreachable!(),
+        Cmd::Detect | Cmd::Doctor | Cmd::Init { .. } | Cmd::Recover { .. } | Cmd::Usage => {
+            unreachable!()
+        }
     }
     Ok(())
 }
@@ -284,6 +290,14 @@ fn usage_text(u: &Usage) -> String {
             human_size(m.only_here())
         );
     }
+    for (id, b) in &u.orphans {
+        s += &format!(
+            "{id:<32} {:<9} {:>7} {:>10}\n",
+            "orphan",
+            "",
+            human_size(*b)
+        );
+    }
     if u.mods.iter().any(|m| !m.enabled && m.applied) {
         s += "disabled* = still in the game until the next apply\n";
     }
@@ -299,6 +313,9 @@ fn usage_text(u: &Usage) -> String {
         human_size(u.total),
         human_size(u.reclaimable()),
     );
+    for n in &u.notes {
+        s += &format!("note: {n}\n");
+    }
     if !u.same_fs {
         s += "warning: the workspace and the game are on different filesystems, so apply copies \
               files instead of hardlinking them: every applied byte is stored twice\n";
@@ -306,27 +323,41 @@ fn usage_text(u: &Usage) -> String {
     s
 }
 
+/// Lists what `remove --disabled` would delete; with `yes` deletes exactly that list.
 fn remove_disabled(ws: &mut Workspace, yes: bool) -> Result<()> {
     let u = ws.usage()?;
-    let gone: Vec<&ModUsage> = u.mods.iter().filter(|m| m.removable()).collect();
-    for m in &gone {
+    for m in u.mods.iter().filter(|m| m.removable()) {
         println!("  - {} ({})", m.id, human_size(m.bytes));
     }
-    if u.staging > 0 {
+    for (id, b) in &u.orphans {
+        println!(
+            "  - {id} ({}, orphan folder: not in the mod list)",
+            human_size(*b)
+        );
+    }
+    let staging = u.staging > 0;
+    if staging {
         println!("  - staging/ leftovers ({})", human_size(u.staging));
     }
-    let held = u.mods.iter().filter(|m| !m.enabled && m.applied);
-    for m in held {
+    for m in u.mods.iter().filter(|m| !m.enabled && m.applied) {
         println!("  kept {}: still applied, apply first", m.id);
     }
-    let size = human_size(u.reclaimable());
     if !yes {
-        println!("would free {size}; re-run with --yes to delete");
+        let size = human_size(u.reclaimable());
+        println!("would free {size}; re-run with --yes to delete exactly this list");
         return Ok(());
     }
-    let n = ws.remove_disabled()?.len();
-    println!("removed {n} mod(s), freed {size}");
-    Ok(())
+    let f = ws.remove_disabled(&u.reclaimable_ids(), staging)?;
+    f.kept.iter().for_each(|k| println!("  kept {k}"));
+    let removed = f.removed.join(", ");
+    println!("removed [{removed}], freed {}", human_size(f.bytes));
+    match f.kept.is_empty() {
+        true => Ok(()),
+        false => Err(input(format!(
+            "{} item(s) could not be removed",
+            f.kept.len()
+        ))),
+    }
 }
 
 fn read(file: &Path) -> Result<Vec<u8>> {

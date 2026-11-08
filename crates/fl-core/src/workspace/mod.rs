@@ -14,12 +14,12 @@ pub mod usage;
 
 use std::collections::BTreeSet;
 use std::fs;
-use std::path::{Path, PathBuf};
+use std::path::{Component, Path, PathBuf};
 
 use serde::{Deserialize, Serialize};
 
 use crate::HOST;
-use crate::adapters::fs::{read_toml, write_atomic, write_toml};
+use crate::adapters::fs::{read_toml, remove_path, write_atomic, write_toml};
 use crate::base::{Snapshot, TreeManifest};
 use crate::error::{Result, input, io};
 use crate::target::Target;
@@ -184,8 +184,12 @@ impl Workspace {
         i.ok_or_else(|| input(format!("unknown mod {id:?}")))
     }
 
-    /// Deletes a disabled mod that the last complete generation does not use.
+    /// Deletes a disabled mod that the last complete generation does not use (a symlinked
+    /// `mods/<id>` loses only the link). Refused while the game runs or an apply is interrupted.
     pub fn remove(&mut self, id: &str) -> Result<()> {
+        check_id(id)?;
+        self.refuse_running()?;
+        self.refuse_pending()?;
         let i = self.position(id)?;
         if !self.state.disabled.contains(id)
             || self.last()?.is_some_and(|g| g.mods.iter().any(|m| m == id))
@@ -195,13 +199,13 @@ impl Workspace {
         self.state.mods.remove(i);
         self.state.disabled.remove(id);
         self.save()?;
-        let d = self.dir.join("mods").join(id);
-        fs::remove_dir_all(&d).map_err(io(&d))
+        remove_path(&self.dir.join("mods").join(id))
     }
 
     /// The mods [`Workspace::remove`] may delete: disabled and not in the last complete
     /// generation, in list order.
     pub fn removable(&self) -> Result<Vec<String>> {
+        self.state.mods.iter().try_for_each(|m| check_id(m))?;
         let applied = self.last()?.map(|g| g.mods).unwrap_or_default();
         let ids = self
             .state
@@ -210,18 +214,14 @@ impl Workspace {
             .filter(|m| self.state.disabled.contains(*m) && !applied.contains(m));
         Ok(ids.cloned().collect())
     }
+}
 
-    /// Deletes every [`Workspace::removable`] mod and the `staging/` leftovers of failed
-    /// imports. Returns the ids removed.
-    pub fn remove_disabled(&mut self) -> Result<Vec<String>> {
-        let ids = self.removable()?;
-        for id in &ids {
-            self.remove(id)?;
-        }
-        let staging = self.dir.join("staging");
-        if fs::symlink_metadata(&staging).is_ok() {
-            fs::remove_dir_all(&staging).map_err(io(&staging))?;
-        }
-        Ok(ids)
+/// A mod id is one plain path component (it names `mods/<id>/`): not empty, no separator, no
+/// `.` or `..`.
+pub fn check_id(id: &str) -> Result<()> {
+    let mut parts = Path::new(id).components();
+    match (parts.next(), parts.next()) {
+        (Some(Component::Normal(n)), None) if n == id => Ok(()),
+        _ => Err(input(format!("bad mod id {id:?}"))),
     }
 }

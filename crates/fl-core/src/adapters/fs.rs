@@ -65,6 +65,18 @@ pub fn place(src: &Path, dst: &Path, link: bool) -> Result<()> {
     fs::rename(&t, dst).map_err(io(dst))
 }
 
+/// Deletes `p` without following symlinks: a symlink itself (never its target), else the file
+/// or the folder tree. A missing `p` is not an error.
+pub fn remove_path(p: &Path) -> Result<()> {
+    let r = match fs::symlink_metadata(p) {
+        Ok(m) if m.is_dir() => fs::remove_dir_all(p),
+        Ok(_) => fs::remove_file(p),
+        Err(e) if e.kind() == io::ErrorKind::NotFound => return Ok(()),
+        Err(e) => Err(e),
+    };
+    r.map_err(io(p))
+}
+
 /// (device, inode) of a file, from metadata read without following symlinks: two paths with the
 /// same id are hardlinks to one file.
 pub fn file_id(m: &fs::Metadata) -> (u64, u64) {

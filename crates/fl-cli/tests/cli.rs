@@ -95,6 +95,17 @@ fn init_import_apply_history_settings() {
     assert_eq!(out, "  0  [ ] machete-cursors\n");
     let (ok, out) = fl(&root, &["-w", ws, "remove", "machete-cursors"]);
     assert!(!ok && out.contains("apply first"), "{out}");
+    // An id or --disabled, never both, never neither.
+    for args in [
+        &["remove", "machete-cursors", "--disabled"][..],
+        &["remove"],
+    ] {
+        let (ok, out) = fl(&root, &[&["-w", ws][..], args].concat());
+        assert!(
+            !ok && out.contains("Usage: fl-modman remove"),
+            "{args:?}: {out}"
+        );
+    }
     let (ok, out) = fl(&root, &["-w", ws, "remove", "--disabled"]);
     assert!(
         ok && out.contains("kept machete-cursors: still applied"),
@@ -123,7 +134,10 @@ fn init_import_apply_history_settings() {
         "{out}"
     );
     let (ok, out) = fl(&root, &["-w", ws, "remove", "--disabled", "--yes"]);
-    assert!(ok && out.contains("removed 1 mod(s)"), "{out}");
+    assert!(
+        ok && out.contains("removed [machete-cursors], freed"),
+        "{out}"
+    );
     assert!(!w.join("mods/machete-cursors").exists());
     assert_eq!(fl(&root, &["-w", ws, "list"]).1, "");
 
