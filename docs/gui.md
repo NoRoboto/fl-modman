@@ -73,7 +73,8 @@ installed (base)" card opens with A, one row per item).
    (`Workspace::usage`, stat only). A ⚠ line when the workspace and the game are on different filesystems, a
    Workspace card (mods, only in the workspace, originals, history, staging leftovers, total, can be freed), then one
    focusable row per mod: id, state (applied / on, not applied yet / off, still in the game / off), file count, size
-   and bytes shared with the game, then orphan folders. Notes (a symlinked or missing mod folder, a broken mod, no
+   and bytes shared with the game (only `hardlink_ext` assets can be; copied files and files a lower mod overrides
+   are not), then orphan folders. Notes (a symlinked or missing mod folder, a broken mod, no
    game folder) show as ⚠ lines; if measuring failed the tab says so (open it again to retry). **Free X** (only when
    something is reclaimable) lists what goes in a confirm that opens on Cancel; Delete runs `remove_disabled` on
    exactly that list (`Act::Free`), reports what was freed and anything kept, and measures again.

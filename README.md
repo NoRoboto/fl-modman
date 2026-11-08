@@ -81,10 +81,20 @@ Where the space goes:
 
 - **Mods you switch off keep their files** in the workspace until you remove them. Switching a mod
   off and applying takes it out of the game, not off the disk.
-- **Applied files are shared, not copied**, when the workspace and the game are on the same drive:
-  the game file and the mod file are one file on disk (a hardlink). If they are on different drives,
-  fl-modman has to copy, and every applied file takes its space twice. Storage warns you when that
-  happens. Keep the workspace next to the game (the default) to avoid it.
+- **Big asset files are shared, not copied**, when the workspace and the game are on the same
+  drive: the game file and the mod file are one file on disk (a hardlink). Only asset types the game
+  never rewrites are shared: `.cpk`, `.acb`, `.awb`, `.ftex` and `.dll`
+  ([`targets/fl27.toml`](crates/fl-core/targets/fl27.toml)). Everything else (`.lua`, `.ini`,
+  `.dds`, `.exe`, text) is copied on purpose, because the game or a Sider module may rewrite it in
+  place (an `.ini` a module saves its options to, for example), and that must not change the mod's
+  own copy. If the workspace and the game are on different drives, nothing can be shared and every
+  applied file takes its space twice. Storage warns you when that happens. Keep the workspace next
+  to the game (the default) to avoid it.
+- **"Only here" is what the workspace adds on top of the game.** It is the sum of three things: the
+  copied files above, files a mod lower in the list overrides (they are never placed, so they are
+  not shared), and every mod that is switched off. For example, an 8.7 GiB graphics pack with
+  5.8 GiB shared and 2.9 GiB only here can mean another pack overrides hundreds of its files. A mod
+  that another mod overrides almost completely is a good candidate to switch off and free.
 - **Your downloaded archives are never deleted.** After an import you can delete the zip or rar
   yourself; fl-modman keeps its own copy.
 

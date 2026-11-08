@@ -84,7 +84,9 @@ checks every pair before writing either file, and refuses render keys while the 
 symlinks never followed. Per mod: files and bytes under `mods/<id>/`, and **shared** bytes: a payload file whose
 (device, inode) equals the file at its tree path in the game, i.e. the hardlink apply made. Only applied mods are
 checked (one extra `lstat` per put). `nlink > 1` was not used: it would also count links fl-modman did not make, and a
-payload another mod overrides. Totals for `mods/`, `originals/`, `history/`, `staging/` and the whole folder;
+payload another mod overrides. `only_here = bytes - shared` is therefore what the workspace adds on top of the
+game: files outside `hardlink_ext` (copied on purpose: the game or a Sider module may rewrite `.ini`/`.lua` in
+place), payload files a lower mod overrides (not placed at all), and every unapplied mod. Totals for `mods/`, `originals/`, `history/`, `staging/` and the whole folder;
 **orphans** are real folders under `mods/` that are not in the list. A symlinked or missing mod folder, a mod whose
 `mod.toml` does not load (shared = 0) and a missing game folder (`same_fs` assumed) become `notes`, not errors.
 **Reclaimable** = mods that are disabled and not in the last complete generation (the `remove` rule,
@@ -97,7 +99,8 @@ applied byte is stored twice. Usage works during an interrupted apply (the CLI a
 `--yes` prints the list (mods, orphans, staging); with `--yes` it deletes exactly the ids it printed: each is checked
 again and kept with a reason if it no longer qualifies, a failure keeps that item and the rest go on, and the
 command exits non-zero if anything was kept. A symlink (`mods/<id>`, `staging`) loses only the link. `staging/` is
-not wiped while anything in it changed in the last 10 minutes (`STAGING_QUIET`: an import may be running).
+not wiped, and an orphan folder is neither listed nor deleted (a note says so), while anything in it changed in
+the last 10 minutes (`QUIET`: an import may be running).
 
 ## Code
 
