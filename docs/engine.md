@@ -28,6 +28,8 @@ export FL_MODMAN=<workspace>             # or pass -w <workspace> to every comma
 fl-modman import <archive|dir> [--type livecpk|lua|stadium|download|loose] [--team <id>[,<slot>]] [--root <path>]
                  [--manifest <mod.toml>]  # e.g. catalog/<id>/mod.toml instead of a generated one
 fl-modman list | enable <id> | disable <id> | move <id> <index> | remove <id>
+fl-modman usage                          # disk usage per mod, totals, reclaimable, filesystem warning
+fl-modman remove --disabled [--yes]      # every disabled, unapplied mod + staging/ leftovers
 fl-modman apply [--yes]                  # without --yes: print the plan only
 fl-modman history | rollback <N> [--yes]
 fl-modman recover --finish | --rollback  # after an interrupted apply
@@ -78,6 +80,18 @@ its whole row and any other field sets `custom`; bytes 0–2 are never written. 
 these (or says the file is missing: the game writes it once its rendering menu was opened); `set` takes keys of both,
 checks every pair before writing either file, and refuses render keys while the file is missing.
 
+**Usage.** `Workspace::usage` (`workspace/usage.rs`) walks the workspace with `symlink_metadata` only: no hashing,
+symlinks never followed (about 0.2 s for 25k payload files, warm cache). Per mod: files and bytes under `mods/<id>/`,
+and **shared** bytes: a payload file whose (device, inode) equals the file at its tree path in the game, i.e. the
+hardlink apply made. Only applied mods are checked (one extra `lstat` per put). `nlink > 1` was not used: it would
+also count links fl-modman did not make, and a payload another mod overrides. Totals for `mods/`, `originals/`,
+`history/`, `staging/` and the whole folder. **Reclaimable** = mods that are disabled and not in the last complete
+generation (the `remove` rule, `Workspace::removable`) plus `staging/`. `same_fs` compares the `st_dev` of the
+workspace and the game: on different filesystems apply copies (hardlinks need one filesystem; btrfs subvolumes count
+as different), so every applied byte is stored twice. `remove --disabled` (`Workspace::remove_disabled`) deletes
+exactly the reclaimable set; without `--yes` it only lists it, and names the disabled mods kept because they are
+still applied.
+
 ## Code
 
 Hexagonal, in `crates/fl-core/src` (grilling Q20b). The CLI (`fl-cli`) and the GUI (`fl-gui`) are thin adapters over
@@ -90,7 +104,7 @@ it. The public API stays flat (`fl_core::{build, plan, manifest, import, setting
 | `codec/` | `sider_ini map_teams settings_dat graphics` | Byte-exact codecs (`render(parse(x)) == x`; binary files write only documented bytes). |
 | `ports.rs` | | `Host`: the game-running check and archive extraction, the two things a Windows build would replace. |
 | `adapters/` | `linux fs detect` | The Linux `Host` (`/proc`, zip/7z, system rar tools), the filesystem edge (atomic writes, hardlink-or-copy, walk, hashing: plain functions, `std::fs` is already portable), game discovery. |
-| `workspace/` | `mod apply scan index import settings` | State, history and generations; apply/recover/restore/rollback/accept-drift with the drift check; cached scans and the base snapshot; `index.json` and package loading; import; `settings.dat` + `GRAPHICS000000` files. |
+| `workspace/` | `mod apply scan index import settings usage` | State, history and generations; apply/recover/restore/rollback/accept-drift with the drift check; cached scans and the base snapshot; `index.json` and package loading; import; `settings.dat` + `GRAPHICS000000` files; disk usage. |
 
 **Add a mod kind:** write `kinds/<kind>.rs` with a unit struct implementing `ModKind` (`detect` returns 0 or a
 confidence: download 50, lua 40, stadium 30, livecpk 20, loose 10; `contribute` usually calls `folder`), add

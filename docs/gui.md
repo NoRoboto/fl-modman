@@ -69,6 +69,12 @@ installed (base)" card opens with A, one row per item).
    picker), then **Rendering (in-game options)** from `GRAPHICS000000` (preset first; changing any other field shows
    the preset as `custom` at once, choosing a preset sets every field). One Save writes both files, each with a
    backup, after a confirm, refused while the game runs; plus the Proton launch-options diagnostic (read only).
+6. **Storage**: measured on a background thread when the tab opens and after Free, never per frame
+   (`Workspace::usage`, stat only). A ⚠ line when the workspace and the game are on different filesystems, a
+   Workspace card (mods, only in the workspace, originals, history, staging leftovers, total, can be freed), then one
+   focusable row per mod: id, state (applied / on, not applied yet / off, still in the game / off), file count, size
+   and bytes shared with the game. **Free X** (only when something is reclaimable) lists what goes in a confirm, then
+   runs `remove_disabled` and measures again.
 
 ## Code
 
@@ -80,4 +86,4 @@ installed (base)" card opens with A, one row per item).
 | `nav.rs` | the focus layer every screen registers its widgets with |
 | `ui.rs` | design tokens and components |
 | `widgets.rs` | numeric picker, folder browser |
-| `pick.rs`, `mods.rs`, `add.rs`, `history.rs`, `settings.rs` | the five screens |
+| `pick.rs`, `mods.rs`, `add.rs`, `history.rs`, `settings.rs`, `storage.rs` | the six screens |

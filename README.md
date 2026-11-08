@@ -18,6 +18,7 @@ applies it, and can undo any apply. Made to be driven with a gamepad, from Steam
 [Add a mod](#add-a-mod) ·
 [History](#every-apply-can-be-undone) ·
 [Game settings](#game-settings) ·
+[Storage](#storage) ·
 [Install](#install) ·
 [CLI](#cli) ·
 [Safety](#safety)
@@ -67,6 +68,23 @@ fl-modman asks before it touches anything.
 
 Resolution, fullscreen, HDR, frame rates and the rendering options, edited straight in the game's
 `settings.dat`, so you don't need the Windows settings tool under Proton. A backup is made first.
+
+## Storage
+
+The **Storage** tab (and `fl-modman usage`) shows how much space each mod takes, how much of it is
+shared with the game, and what the workspace holds in total. **Free** deletes the mods that are
+switched off and no longer applied (the same rule as `fl-modman remove --disabled`).
+
+Where the space goes:
+
+- **Mods you switch off keep their files** in the workspace until you remove them. Switching a mod
+  off and applying takes it out of the game, not off the disk.
+- **Applied files are shared, not copied**, when the workspace and the game are on the same drive:
+  the game file and the mod file are one file on disk (a hardlink). If they are on different drives,
+  fl-modman has to copy, and every applied file takes its space twice. Storage warns you when that
+  happens. Keep the workspace next to the game (the default) to avoid it.
+- **Your downloaded archives are never deleted.** After an import you can delete the zip or rar
+  yourself; fl-modman keeps its own copy.
 
 ## Install
 
