@@ -25,7 +25,7 @@ applies it, and can undo any apply. Made to be driven with a gamepad, from Steam
 
 </div>
 
-<img src="media/tour.webp" width="100%" alt="The four tabs of the GUI in turn: the mod list, the file picker, the history of applies and the game settings">
+<img src="media/tour.webp" width="100%" alt="The five tabs of the GUI in turn: the mod list, the file picker, the history of applies, the game settings and the disk usage">
 
 ## Tested on
 
@@ -70,6 +70,8 @@ Resolution, fullscreen, HDR, frame rates and the rendering options, edited strai
 `settings.dat`, so you don't need the Windows settings tool under Proton. A backup is made first.
 
 ## Storage
+
+<img src="media/storage.png" width="100%" alt="Storage: workspace totals (mods 13.4 GiB, 4.6 GiB only in the workspace, 577.8 MiB of game files kept for undo, 14.0 GiB total) and each mod with its size and how much it shares with the game">
 
 The **Storage** tab (and `fl-modman usage`) shows how much space each mod takes, how much of it is
 shared with the game, and what the workspace holds in total. **Free** lists the mods that are
