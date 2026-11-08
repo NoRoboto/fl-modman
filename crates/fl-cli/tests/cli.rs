@@ -95,13 +95,37 @@ fn init_import_apply_history_settings() {
     assert_eq!(out, "  0  [ ] machete-cursors\n");
     let (ok, out) = fl(&root, &["-w", ws, "remove", "machete-cursors"]);
     assert!(!ok && out.contains("apply first"), "{out}");
+    let (ok, out) = fl(&root, &["-w", ws, "remove", "--disabled"]);
+    assert!(
+        ok && out.contains("kept machete-cursors: still applied"),
+        "{out}"
+    );
     assert!(fl(&root, &["-w", ws, "apply", "--yes"]).0);
+    let (ok, out) = fl(&root, &["-w", ws, "usage"]);
+    assert!(
+        ok && out.contains("machete-cursors") && out.contains("reclaimable"),
+        "{out}"
+    );
+    assert!(!out.contains("different filesystems"), "{out}");
+    let (ok, out) = fl(&root, &["-w", ws, "remove", "--disabled"]);
+    assert!(
+        ok && out.contains("- machete-cursors") && out.contains("--yes"),
+        "{out}"
+    );
+    assert!(
+        w.join("mods/machete-cursors").is_dir(),
+        "a dry run deletes nothing"
+    );
     let (_, out) = fl(&root, &["-w", ws, "history"]);
     assert!(
         out.contains("0001  Complete  apply  [machete-cursors]")
             && out.contains("0002  Complete  apply  []"),
         "{out}"
     );
+    let (ok, out) = fl(&root, &["-w", ws, "remove", "--disabled", "--yes"]);
+    assert!(ok && out.contains("removed 1 mod(s)"), "{out}");
+    assert!(!w.join("mods/machete-cursors").exists());
+    assert_eq!(fl(&root, &["-w", ws, "list"]).1, "");
 
     let (ok, out) = fl(
         &root,

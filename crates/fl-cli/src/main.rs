@@ -10,6 +10,7 @@ use fl_core::error::input;
 use fl_core::import::{Options, import};
 use fl_core::kinds::Kind;
 use fl_core::plan::{Plan, human_size};
+use fl_core::usage::{ModUsage, Usage};
 use fl_core::workspace::Workspace;
 use fl_core::{Result, detect, graphics, hash, settings};
 
@@ -23,7 +24,7 @@ struct Cli {
     /// Workspace folder [default: $FL_MODMAN; for init: <game-dir>/../fl-modman]
     #[arg(short, long, global = true)]
     workspace: Option<PathBuf>,
-    /// Write the changes (apply, rollback); without it only the plan is shown.
+    /// Write the changes (apply, rollback, remove --disabled); without it only the plan is shown.
     #[arg(long, global = true)]
     yes: bool,
     #[command(subcommand)]
@@ -68,10 +69,16 @@ enum Cmd {
         id: String,
         index: usize,
     },
-    /// Delete a disabled, unapplied mod.
+    /// Delete a disabled, unapplied mod; --disabled: all of them and staging/ leftovers (--yes).
     Remove {
-        id: String,
+        #[arg(required_unless_present = "disabled", conflicts_with = "disabled")]
+        id: Option<String>,
+        /// Every disabled mod no longer applied, plus staging/ leftovers; lists them without --yes.
+        #[arg(long)]
+        disabled: bool,
     },
+    /// Show the disk usage of the workspace per mod, and what `remove --disabled` frees.
+    Usage,
     /// Show the plan; with --yes apply it as a new generation.
     Apply,
     History,
@@ -186,7 +193,9 @@ fn run(cli: Cli) -> Result<()> {
             ws.state.mods.insert(index.min(ws.state.mods.len()), m);
             ws.save()?;
         }
-        Cmd::Remove { id } => ws.remove(&id)?,
+        Cmd::Remove { id: Some(id), .. } => ws.remove(&id)?,
+        Cmd::Remove { id: None, .. } => remove_disabled(&mut ws, cli.yes)?,
+        Cmd::Usage => print!("{}", usage_text(&ws.usage()?)),
         Cmd::Apply => report(ws.apply(&ws.enabled(), "apply", cli.yes, true)?),
         Cmd::Rollback { n } => report(ws.rollback(n, cli.yes)?),
         Cmd::Restore => report(ws.restore()?),
@@ -250,6 +259,73 @@ fn run(cli: Cli) -> Result<()> {
         }
         Cmd::Detect | Cmd::Doctor | Cmd::Init { .. } | Cmd::Recover { .. } => unreachable!(),
     }
+    Ok(())
+}
+
+/// The usage table, totals, reclaimable and the filesystem warning.
+fn usage_text(u: &Usage) -> String {
+    let mut s = format!(
+        "{:<32} {:<9} {:>7} {:>10} {:>10} {:>10}\n",
+        "mod", "state", "files", "size", "shared", "only here"
+    );
+    for m in &u.mods {
+        let state = match (m.enabled, m.applied) {
+            (true, true) => "applied",
+            (true, false) => "pending",
+            (false, true) => "disabled*",
+            (false, false) => "disabled",
+        };
+        s += &format!(
+            "{:<32} {state:<9} {:>7} {:>10} {:>10} {:>10}\n",
+            m.id,
+            m.files,
+            human_size(m.bytes),
+            human_size(m.shared),
+            human_size(m.only_here())
+        );
+    }
+    if u.mods.iter().any(|m| !m.enabled && m.applied) {
+        s += "disabled* = still in the game until the next apply\n";
+    }
+    let only: u64 = u.mods.iter().map(ModUsage::only_here).sum();
+    s += &format!(
+        "\nmods/ {} ({} only in the workspace)   originals/ {}   history/ {}   staging/ {}\n\
+         workspace total {}\nreclaimable {} (remove --disabled)\n",
+        human_size(u.mods_dir),
+        human_size(only),
+        human_size(u.originals),
+        human_size(u.history),
+        human_size(u.staging),
+        human_size(u.total),
+        human_size(u.reclaimable()),
+    );
+    if !u.same_fs {
+        s += "warning: the workspace and the game are on different filesystems, so apply copies \
+              files instead of hardlinking them: every applied byte is stored twice\n";
+    }
+    s
+}
+
+fn remove_disabled(ws: &mut Workspace, yes: bool) -> Result<()> {
+    let u = ws.usage()?;
+    let gone: Vec<&ModUsage> = u.mods.iter().filter(|m| m.removable()).collect();
+    for m in &gone {
+        println!("  - {} ({})", m.id, human_size(m.bytes));
+    }
+    if u.staging > 0 {
+        println!("  - staging/ leftovers ({})", human_size(u.staging));
+    }
+    let held = u.mods.iter().filter(|m| !m.enabled && m.applied);
+    for m in held {
+        println!("  kept {}: still applied, apply first", m.id);
+    }
+    let size = human_size(u.reclaimable());
+    if !yes {
+        println!("would free {size}; re-run with --yes to delete");
+        return Ok(());
+    }
+    let n = ws.remove_disabled()?.len();
+    println!("removed {n} mod(s), freed {size}");
     Ok(())
 }
 
