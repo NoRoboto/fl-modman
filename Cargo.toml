@@ -6,7 +6,7 @@ members = ["crates/fl-core", "crates/fl-cli", "crates/fl-gui"]
 edition = "2024"
 rust-version = "1.96"
 license = "MIT"
-version = "0.1.0"
+version = "0.2.0"
 
 [workspace.dependencies]
 blake3 = "=1.8.7"
