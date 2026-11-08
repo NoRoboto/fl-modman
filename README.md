@@ -6,12 +6,12 @@
 fl-modman works out what to copy and which `sider.ini` lines to add, shows you the plan,
 applies it, and can undo any apply. Made to be driven with a gamepad, from Steam Gaming Mode.
 
-[![Linux](https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black)](#install)
-[![Proton](https://img.shields.io/badge/Proton-1B2838?style=for-the-badge&logo=steam&logoColor=white)](#install)
-[![FL27 only](https://img.shields.io/badge/SP_Football_Life_2027-only-2E7D32?style=for-the-badge)](#tested-on)
-[![Rust](https://img.shields.io/badge/Rust-000000?style=for-the-badge&logo=rust&logoColor=white)](Cargo.toml)
-[![MIT](https://img.shields.io/badge/MIT-3DA639?style=for-the-badge)](LICENSE)
-[![Release](https://img.shields.io/github/v/release/NoRoboto/fl-modman?style=for-the-badge&logo=github&labelColor=24292F)](https://github.com/NoRoboto/fl-modman/releases/latest)
+[![Linux](media/badges/linux.svg)](#install)
+[![Proton](media/badges/proton.svg)](#install)
+[![FL27 only](media/badges/fl27.svg)](#tested-on)
+[![Rust](media/badges/rust.svg)](Cargo.toml)
+[![MIT](media/badges/mit.svg)](LICENSE)
+[![Release](media/badges/release.svg)](https://github.com/NoRoboto/fl-modman/releases/latest)
 
 [Tested on](#tested-on) ·
 [My mods](#one-list-the-lower-mod-wins) ·
