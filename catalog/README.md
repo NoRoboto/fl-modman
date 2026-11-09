@@ -1,20 +1,20 @@
 # Catalog
 
-Ready-made `mod.toml` files for public mods. The catalog holds **links and manifests only**, never mod files:
-download each mod from its author's page.
+`mod.toml` files for public mods. Links and manifests only, never mod files: download each mod from its author's
+page.
 
-Each folder has `mod.toml` and `SOURCE.md` (author, link, archive name, what goes where, and the import command when
-the mod needs `--root` or `--type`). Import with:
+Each folder has a `mod.toml` and a `SOURCE.md` (author, link, archive name, what goes where, and the import command
+when the mod needs `--root` or `--type`). Import with:
 
 ```sh
 fl-modman import <downloaded archive> --manifest catalog/<id>/mod.toml
 ```
 
-**FL27 column**
+FL27 column:
 
-- **verified**: imported and applied with fl-modman on SP Football Life 2027 (ROG Ally, Bazzite).
-- **claimed**: the mod page says it works with SP Football Life (sometimes an older FL).
-- **unknown**: the page does not say, or the mod needs something FL27 may not ship.
+- verified: imported and applied with fl-modman on SP Football Life 2027 (ROG Ally, Bazzite).
+- claimed: the mod page says it works with SP Football Life (sometimes an older FL).
+- unknown: the page does not say, or the mod needs something FL27 may not ship.
 
 | Mod | Type | FL27 | Source |
 |---|---|---|---|
@@ -41,8 +41,8 @@ fl-modman import <downloaded archive> --manifest catalog/<id>/mod.toml
 | [Realistic TV ReShade preset](realistic-tv-reshade) | loose file | unknown | [pesmodding](https://www.pesmodding.com/2024/01/pes-2021-realistic-tv-broadcast-reshade.html) |
 | [ultra_hdgraphic](ultra-hdgraphic) | livecpk | unknown | no public page |
 
-Mods that fl-modman cannot install safely (opaque `.exe` installers, whole `sider.ini` files, save-folder edits) are
-listed with the reason in [EXCLUDED.md](EXCLUDED.md).
+Mods fl-modman will not install (opaque `.exe` installers, whole `sider.ini` files, save-folder edits) are in
+[EXCLUDED.md](EXCLUDED.md) with the reason.
 
-To add a mod to this list, see the wiki page
-[Add your mod to the catalog](https://github.com/NoRoboto/fl-modman/wiki/Add-your-mod-to-the-catalog).
+To add a mod, see [Add your mod to the catalog](https://github.com/NoRoboto/fl-modman/wiki/Add-your-mod-to-the-catalog)
+on the wiki.
