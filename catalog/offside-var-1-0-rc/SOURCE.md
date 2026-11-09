@@ -3,7 +3,8 @@
 - Author: Kris1982. Archive `FL27_Pes21_Offside_VAR_1.0-rc.zip` (2026-11-07).
 - Video: https://www.youtube.com/watch?v=RPtgnXa21W4
 - Download: https://drive.google.com/file/d/1AKIX_WpryLa0ORHJ-I4nGa37LppZ9RJR/view
-- Type: Lua module + livecpk model + ReShade add-on and effect.
+- Type: Lua module + livecpk model + ReShade add-on and effect. FL27: **verified** (made for FL27; imported and
+  applied with fl-modman on the Ally, LAB 2026-11-07 and stable 2026-11-08).
 
 ## Original instructions (brief)
 
@@ -18,3 +19,9 @@
 - `offside.lua` + `offside.ini` to `@modules/`, one `lua_module` line (FL27 loads both libs first).
 - `offside_banner.addon64` and `reshade-shaders/` next to the exe (`ReShade.ini` searches `.\reshade-shaders\**`).
 - `README_Offside_VAR.txt` is not installed.
+
+## Import
+
+```sh
+fl-modman import FL27_Pes21_Offside_VAR_1.0-rc.zip --root . --type loose --manifest catalog/offside-var-1-0-rc/mod.toml
+```
