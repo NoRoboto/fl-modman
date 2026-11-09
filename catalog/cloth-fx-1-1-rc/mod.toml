@@ -1,0 +1,11 @@
+name = "cloth-fx"
+version = "1.1-rc"
+lua_module = ["cloth-fx.lua"]
+
+[[put]]
+from = "game/modules/cloth-fx.lua"
+to = "@modules/cloth-fx.lua"
+
+[[put]]
+from = "game/content/cloth-render/"
+to = "@sider/content/cloth-render/"
